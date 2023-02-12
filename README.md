@@ -1,5 +1,15 @@
-## Running the app
+## Install the app
+```bash
+# clone app from git
+$ git clone https://github.com/Newcss/NLessons.git
+# cd to the app directory
+$ cd NLessons
+# install dependencies
+$ npm install
 
+```
+
+## Running the app
 ```bash
 # start app
 $ docker-compose up
