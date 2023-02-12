@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  dev:
+    container_name: nlessons_api_dev
+    image: nlessons-api-dev:1.0.0
+    depends_on:
+      - db
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+      - 9229:9229
+    networks:
+      - nlessons-network
+    links:
+      - db
+      - pgadmin
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
+    #command: npm run start:dev
+    command: npm run start:debug
+
+  db:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "nlessonsdb"
+      POSTGRES_USER: "nlessonsuser"
+      POSTGRES_PASSWORD: "12345678"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      volumes:
+    volumes:
+      - .:/var/lib/postgresql/data
+      - ./pgdump/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nlessons-network
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:5.7
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "newcss@test.com"
+      PGADMIN_DEFAULT_PASSWORD: "12345678"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - nlessons-network
+networks:
+  nlessons-network:
